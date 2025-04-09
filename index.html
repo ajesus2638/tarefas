@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarefa-verso</title>
+    <link rel="shortcut icon" href="miles-swinging-1_ver_1.png" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /*   ol{
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 0px;
+        }
+        li{
+            background-color: blanchedalmond;
+            display: flex;
+            gap: 8px;
+            padding: 6px 12px;
+        }  */
+    </style>
+</head>
+
+<body>
+    <div class="container">
+    
+
+        <h1>Lista de Tarefas</h1>
+
+        <!-- <form action="http://localhost:8080/tarefa" method="POST"> -->
+        <input type="text" placeholder="Digite a tarefa" id="tarefa" required>
+        <select name="" id="categoria">
+            <option value="trabalho">Trabalho</option>
+            <option value="casa">Casa</option>
+        </select>
+        <button class="tarefa" onclick="salvarTarefa()">Salvar tarefa</button>
+        <!-- </form> -->
+
+        <ol id="listaDeTarefas">
+
+        </ol>
+
+        <script>
+            const olHTML = document.getElementById("listaDeTarefas")
+
+
+            async function baixarTarefas() {
+                var tarefas = await fetch("http://localhost:8080/tarefas") //faz a conexão
+                var listaDeTarefas = await tarefas.json() //converte a resposta para JSON
+
+                olHTML.innerHTML = ""
+                listaDeTarefas.forEach((tarefa, index) => {
+                    const li = document.createElement("li")
+                    if (tarefa.categoria == "casa"){
+                        li.innerHTML =  `🏡<span>${tarefa.tarefa}</span><button class="excluir" onclick='excluirTarefa(${tarefa.id})'>Excluir</button>`
+                    }
+                    else if(tarefa.categoria == "trabalho"){
+                        li.innerHTML =  `💼<span>${tarefa.tarefa}</span><button class="excluir" onclick='excluirTarefa(${tarefa.id})'>Excluir</button>`
+                    }
+                    olHTML.appendChild(li)
+                })
+            }
+
+            async function salvarTarefa() {
+                let tarefa = document.getElementById("tarefa").value
+                let categoria = document.getElementById("categoria").value
+
+                let req = await fetch("http://localhost:8080/tarefa", {
+                    method: "POST", // metodo HTTP POST
+                    headers: {
+                        "Content-Type": "application/json",//Especifica que o conteudo é um OBJ JS
+                    },
+                    body: JSON.stringify({ tarefa ,categoria })
+                    //converte o VALUE recebido do INPUT para o CORPO DA REQUISICAO
+                })
+                baixarTarefas()
+            }
+
+            async function excluirTarefa(index) {
+                let req = await fetch("http://localhost:8080/tarefa/" + index,
+                    { method: "DELETE" })
+                baixarTarefas()
+            }
+
+            baixarTarefas()
+
+
+        </script>
+    </div>
+</body>
+
+</html>
